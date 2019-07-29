@@ -30,6 +30,10 @@ public class MainScript : MonoBehaviour
     {
         if (Input.GetKeyDown("escape"))
         {
+            if (victoryContainer.active)
+            {
+                victoryContainer.SetActive(false);
+            }
             ESCcontainer.SetActive(!ESCcontainer.activeSelf);
         }
     }
@@ -43,8 +47,8 @@ public class MainScript : MonoBehaviour
 
         for (int i = 0; i < AppManager.DECK_SIZE; i++)
         {
-            deck1.Add(CardManager.cards[Random.Range(0, CardManager.cards.Count)]);
-            deck2.Add(CardManager.cards[Random.Range(0, CardManager.cards.Count)]);
+            deck1.Add(CardManager.cards[i]);
+            deck2.Add(CardManager.cards[i]);
         }
 
 

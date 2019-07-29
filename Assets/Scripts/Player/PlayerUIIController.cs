@@ -9,10 +9,13 @@ public class PlayerUIIController : MonoBehaviour {
     public Text deck;
     public Transform hand;
     public Player player;
+    public GameObject dropping;
+    public Text droppingCount;
 
     public PlayerUIIController(Player _player)
     {
         player = _player;
+       
     }
 
     public void updateCount()
@@ -29,5 +32,10 @@ public class PlayerUIIController : MonoBehaviour {
     public void updateScore()
     {
         score.text = player.score.ToString();
+    }
+
+    public void updateDroppingCount()
+    {
+        droppingCount.text = dropping.transform.childCount.ToString();
     }
 }

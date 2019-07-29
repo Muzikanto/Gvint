@@ -4,21 +4,20 @@ using UnityEngine;
 using UnityEngine.UI;
 
 public class LineCards: MonoBehaviour {
-    List<Card> cards = new List<Card>();
+    public List<CardController> cards = new List<CardController>();
     public bool baff = false;
     public int score = 0;
 
-    Text scoreText;
+    public Text scoreText;
 
     private void Start()
     {
-        scoreText = transform.Find("Score").GetComponent<Text>();
         calcScore();
     }
 
-    public void Add(Card card)
+    public void Add(CardController cardController)
     {
-        cards.Add(card);
+        cards.Add(cardController);
         calcScore();
     }
 
@@ -26,9 +25,9 @@ public class LineCards: MonoBehaviour {
     {
         int secondScore = 0;
 
-        foreach (Card card in cards)
+        foreach (CardController cardController in cards)
         {
-            secondScore += card.score;
+            secondScore += cardController.card.score;
         }
 
         score = secondScore;

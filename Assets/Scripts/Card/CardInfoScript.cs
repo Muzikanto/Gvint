@@ -4,24 +4,28 @@ using UnityEngine;
 using UnityEngine.UI;
 
 public class CardInfoScript : MonoBehaviour {
-    Text score;
-    Image type;
-    CardController cardController;
-
-    void Awake()
-    {
-        score = transform.Find("score").transform.Find("value").GetComponent<Text>();
-        type = transform.Find("type").GetComponent<Image>();
-        cardController = GetComponent<CardController>();
-    }
+    public Text score;
+    public Image type, subtype;
+    public CardController cardController;
 
     public void ShowCardInfo()
     {
-        GetComponent<Image>().sprite = cardController.card.sprite;
+        Card card = cardController.card;
 
-        score.text = cardController.card.score.ToString();
+        GetComponent<Image>().sprite = card.sprite;
 
-        switch (cardController.card.type)
+        if (card.type == CardType.SPEC)
+        {
+            Destroy(transform.Find("score").gameObject);
+            Destroy(type.gameObject);
+            Destroy(subtype.gameObject);
+
+            return;
+        }
+
+        score.text = card.score.ToString();
+
+        switch (card.type)
         {
             case CardType.HELPER:
                 type.sprite = Resources.Load<Sprite>("Sprite/icon/helper");
@@ -34,12 +38,28 @@ public class CardInfoScript : MonoBehaviour {
                 break;
         }
 
+
+        switch (cardController.card.subtype)
+        {
+            case CardSubType.DOCTOR:
+                subtype.sprite = Resources.Load<Sprite>("Sprite/icon/doctor");
+                break;
+            case CardSubType.SPOOK:
+                subtype.sprite = Resources.Load<Sprite>("Sprite/icon/spook");
+                break;
+            case CardSubType.SQUAD:
+                subtype.sprite = Resources.Load<Sprite>("Sprite/icon/squad");
+                break;
+            case CardSubType.NONE:
+                subtype.gameObject.SetActive(false);
+                break;
+        }
+
         if (cardController.card.god)
         {
             transform.Find("score").GetComponent<Image>().sprite = Resources.Load<Sprite>("Sprite/icon/score_god");
             score.color = new Color(255, 255, 255);
-        }
-       
+        }    
     }
 }
 

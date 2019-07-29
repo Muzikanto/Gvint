@@ -6,7 +6,7 @@ using System.Collections;
 public static class AppManager
 {
     public static int DECK_SIZE = 13;
-    public static int CARD_IN_HAND = 5;
+    public static int CARD_IN_HAND = 10;
 
     public static void startGame()
     {

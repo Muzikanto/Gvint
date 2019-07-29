@@ -17,6 +17,7 @@ public class Player : MonoBehaviour
         deck = _deck;
         ui.updateCount();
         ui.updateScore();
+        ui.updateDroppingCount();
     }
 
     public void takeCard()
@@ -37,18 +38,18 @@ public class Player : MonoBehaviour
         ui.updateDeckCount();
     }
 
-    public void onPlaceCard(Card card)
+    public void onPlaceCard(CardController cardController)
     {
-        switch (card.type)
+        switch (cardController.card.type)
         {
             case CardType.HELPER:
-                helpers.Add(card);
+                helpers.Add(cardController);
                 break;
             case CardType.ARCHER:
-                archers.Add(card);
+                archers.Add(cardController);
                 break;
             case CardType.KNIGHT:
-                knights.Add(card);
+                knights.Add(cardController);
                 break;
         }
 

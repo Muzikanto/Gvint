@@ -68,4 +68,10 @@ public class CardMovementScript : MonoBehaviour, IBeginDragHandler, IDragHandler
         TempCardGO.transform.localPosition = new Vector3(2340, 0);
         // --------
     }
+
+    public void MoveToParent(Transform newParent)
+    {
+        transform.SetParent(newParent);
+        GetComponent<RectTransform>().localPosition = new Vector3(0, 0, 0);
+    }
 }

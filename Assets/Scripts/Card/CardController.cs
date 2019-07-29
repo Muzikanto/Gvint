@@ -15,9 +15,6 @@ public class CardController : MonoBehaviour {
         card = _card;
         isPlayerOneCard = player.isPlayerOne;
 
-        Info = gameObject.AddComponent<CardInfoScript>();
-        Movement = gameObject.AddComponent<CardMovementScript>();
-
         Info.ShowCardInfo();
     }
 }

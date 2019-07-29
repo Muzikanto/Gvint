@@ -3,10 +3,9 @@ using UnityEngine.EventSystems;
 
 public enum FieldType
 {
-    SELF_HAND,
     SELF_FIELD,
     ENEMY_FIELD,
-    ENEMY_HAND,
+    SPECS_FIELD
 }
 
 public class DropPlaceScript : MonoBehaviour, IDropHandler {
@@ -15,19 +14,39 @@ public class DropPlaceScript : MonoBehaviour, IDropHandler {
 
     public void OnDrop(PointerEventData eventData)
     {
-        // if (Type != FieldType.SELF_FIELD)
-        if (Type != FieldType.SELF_FIELD && MainScript.game.isPlayerTurn || Type == FieldType.SELF_FIELD && !MainScript.game.isPlayerTurn)
-        {
-            return;
-        }
-
         CardController cardController = eventData.pointerDrag.GetComponent<CardController>();
         Card card = cardController.card;
 
-        if (cardController && TypeCard == card.type && cardController.Movement.isDraggable)
+        bool myTurn = Type == FieldType.SELF_FIELD && MainScript.game.isPlayerTurn;
+        bool enemyTurn = Type == FieldType.ENEMY_FIELD && !MainScript.game.isPlayerTurn;
+
+        if ((myTurn || enemyTurn) == false)
         {
-            cardController.Movement.DefaultParent = transform;
-            MainScript.game.onPlayerPlaceCard(card);
+            bool isSpook = card.subtype == CardSubType.SPOOK;
+            bool isSpec = card.type == CardType.SPEC && Type == FieldType.SPECS_FIELD;
+        
+            if ((isSpook || isSpec || myTurn || enemyTurn) == false)
+            {
+                return;
+            }
+        }
+
+        if (TypeCard == card.type && cardController.Movement.isDraggable)
+        {
+            switch (card.subtype)
+            {
+                case CardSubType.SPOOK:
+                    MainScript.game.onPlaceSpook(cardController, Type);
+                    break;
+                case CardSubType.DESTROY:
+                    MainScript.game.onPlaceDestoy(cardController);
+                    break;
+                default:
+                    MainScript.game.onPlaceCard(cardController);
+                    break;
+            }
+
+            cardController.Movement.DefaultParent = transform;            
         }
     }
 }
