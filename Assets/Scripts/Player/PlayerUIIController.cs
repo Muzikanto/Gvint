@@ -20,7 +20,7 @@ public class PlayerUIIController : MonoBehaviour {
 
     public void updateCount()
     {
-        count.text = player.handCardsCount.ToString();
+        count.text = player.ui.hand.childCount.ToString();
     }
 
 

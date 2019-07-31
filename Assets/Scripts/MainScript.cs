@@ -12,9 +12,15 @@ public class MainScript : MonoBehaviour
     [SerializeField]
     private GameObject victoryContainer;
     [SerializeField]
-    private GameObject ESCcontainer;
+    private GameObject ESCContainer;
+    [SerializeField]
+    private GameObject GameContainer;
     [SerializeField]
     private CardController _previewCard;
+    [SerializeField]
+    private Player Player1;
+    [SerializeField]
+    private Player Player2;
 
     public static CardController previewCard;
     public static GameManager game = null;
@@ -40,13 +46,14 @@ public class MainScript : MonoBehaviour
             {
                 victoryContainer.SetActive(false);
             }
-            ESCcontainer.SetActive(!ESCcontainer.activeSelf);
+            ESCContainer.SetActive(!ESCContainer.activeSelf);
+            GameContainer.SetActive(!GameContainer.activeSelf);
         }
     }
 
     public void StartGame()
     {
-        game = new GameManager(this, GameObject.Find("Player1").GetComponent<Player>(), GameObject.Find("Player2").GetComponent<Player>());
+        game = new GameManager(this, Player1, Player2);
         game.player2.ui.hand.gameObject.SetActive(true);
 
         List<Card> deck1 = new List<Card>();
@@ -95,11 +102,12 @@ public class MainScript : MonoBehaviour
         HidePreviewCard();
     }
 
-    public static void ShowPreviewCard(Card card, Player player)
+    public static void ShowPreviewCard(CardController cardController)
     {
-        previewCard.Init(card, player);
+        previewCard.Init(cardController.card, cardController.player);
         previewCard.Info.ActivateAll();
         previewCard.Info.ShowCardInfo();
+        previewCard.Info.UpdateBaffCard();
         previewCard.gameObject.SetActive(true);
     }
 

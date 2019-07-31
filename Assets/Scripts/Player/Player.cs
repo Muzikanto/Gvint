@@ -12,7 +12,7 @@ public class Player : MonoBehaviour
     public PlayerUIIController ui;
 
     [HideInInspector]
-    public int score = 0, handCardsCount = 0;
+    public int score = 0;
     [HideInInspector]
     public List<Card> deck = new List<Card>();
 
@@ -37,7 +37,6 @@ public class Player : MonoBehaviour
         GameObject cardGO = Instantiate(CardManager.cardPref, ui.hand);
         cardGO.GetComponent<CardController>().Init(card, this);
 
-        handCardsCount++;
         ui.updateCount();
         ui.updateDeckCount();
     }
@@ -47,26 +46,23 @@ public class Player : MonoBehaviour
         switch (cardController.card.type)
         {
             case CardType.HELPER:
-                helpers.Add(cardController);
+                helpers.updateScore();
                 break;
             case CardType.ARCHER:
-                archers.Add(cardController);
+                archers.updateScore();
                 break;
             case CardType.KNIGHT:
-                knights.Add(cardController);
+                knights.updateScore();
                 break;
         }
-
-        ui.updateScore();
-
-        handCardsCount--;
     }
 
     public void updateScore()
     {
-        helpers.calcScore();
-        archers.calcScore();
-        knights.calcScore();
+        helpers.updateScore();
+        archers.updateScore();
+        knights.updateScore();
+
         score = helpers.score + archers.score + knights.score;
         ui.updateScore();
     }

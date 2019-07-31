@@ -18,31 +18,13 @@ public class GameManager
         player2 = _player2;
     }
 
-    public void onPlaceCard(CardController cardController)
-    {
-        if (isPlayerTurn)
-        {
-            player1.onPlaceCard(cardController);
-            player1.updateScore();
-            player1.updateCount();
-
-            changeTurn();
-        } else
-        {
-            player2.onPlaceCard(cardController);
-            player2.updateScore();
-            player2.updateCount();
-
-            changeTurn();
-        }
-    }
-
     public void changeTurn()
     {
-        if(player2.handCardsCount == 0 && player1.handCardsCount == 0)
+        if (player2.ui.hand.childCount == 0 && player1.ui.hand.childCount == 0)
         {
             instance.ShowVictory();
-        } else
+        }
+        else
         {
             isPlayerTurn = !isPlayerTurn;
         }
@@ -50,53 +32,71 @@ public class GameManager
         instance.onChangeTurn();
     }
 
-    public void onPlaceSpook(CardController cardController, FieldType Type)
+    public void onPlaceCard(CardController cardController, FieldType Type)
     {
-        if (isPlayerTurn)
+        Player turnPlayer = isPlayerTurn ? player1 : player2;
+        Player turnNextPlayer = isPlayerTurn ? player2 : player1;
+    
+        switch (cardController.card.subtype)
         {
-            if(Type == FieldType.ENEMY_FIELD)
-            {
-                player1.takeCard();
-                player1.takeCard();
-
-                player2.onPlaceCard(cardController);
-
-                player1.updateCount();
-                player2.updateScore();
-
-                changeTurn();
-            } else {
-                onPlaceCard(cardController);
-            }
-        } else {
-            if(Type == FieldType.SELF_FIELD)
-            {
-                player2.takeCard();
-                player2.takeCard();
-
-                player1.onPlaceCard(cardController);
-
-                player2.updateCount();
-                player1.updateScore();
-
-                changeTurn();
-            } else {
-                onPlaceCard(cardController);
-            }
+            case CardSubType.SPOOK:
+                onPlaceSpook(cardController, Type, turnPlayer, turnNextPlayer);
+                break;
+            case CardSubType.DESTROY:
+                onPlaceDestroy(cardController);
+                break;
+            case CardSubType.DOCTOR:
+                onPlaceDoctor(cardController, turnPlayer);
+                break;
+            case CardSubType.SQUAD:
+                onPlaceSquad(cardController, turnPlayer);
+                break;
+            default:
+                onPlaceStandart(cardController, turnPlayer);
+                break;
         }
     }
 
-    public void onPlaceDestoy(CardController destroyCardController)
+    public void onPlaceStandart(CardController cardController, Player player)
+    {
+        player.onPlaceCard(cardController);
+        player.updateScore();
+        player.updateCount();
+
+        changeTurn();
+    }
+
+    public void onPlaceSpook(CardController cardController, FieldType Type, Player turnPlayer, Player turnNextPlayer)
+    {
+        if (Type == FieldType.ENEMY_FIELD && turnPlayer.isPlayerOne || Type == FieldType.SELF_FIELD && !turnPlayer.isPlayerOne)
+        {
+            turnPlayer.takeCard();
+            turnPlayer.takeCard();
+
+            turnNextPlayer.onPlaceCard(cardController);
+
+            turnPlayer.updateCount();
+            turnNextPlayer.updateScore();
+
+            changeTurn();
+        }
+        else
+        {
+            onPlaceStandart(cardController, turnPlayer);
+        }
+    }
+
+    public void onPlaceDestroy(CardController destroyCardController)
     {
         int maxScore = 0;
         List<CardController> allCards = new List<CardController>();
 
-        allCards.AddRange(player1.helpers.cards);
-        allCards.AddRange(player1.archers.cards);
-        allCards.AddRange(player1.knights.cards);
-        allCards.AddRange(player2.knights.cards);
-        allCards.AddRange(player2.archers.cards);
-        allCards.AddRange(player2.helpers.cards);
+        allCards.AddRange(player1.helpers.getCards());
+        allCards.AddRange(player1.archers.getCards());
+        allCards.AddRange(player1.knights.getCards());
+        allCards.AddRange(player2.knights.getCards());
+        allCards.AddRange(player2.archers.getCards());
+        allCards.AddRange(player2.helpers.getCards());
 
         foreach (CardController cardController in allCards)
         {
@@ -108,12 +108,12 @@ public class GameManager
             }
         }
 
-        MoveToDropping(player1.helpers, maxScore);
-        MoveToDropping(player1.archers, maxScore);
-        MoveToDropping(player1.knights, maxScore);
-        MoveToDropping(player2.knights, maxScore);
-        MoveToDropping(player2.archers, maxScore);
-        MoveToDropping(player2.helpers, maxScore);
+        MoveToDropping(player1.helpers.getCards(), maxScore);
+        MoveToDropping(player1.archers.getCards(), maxScore);
+        MoveToDropping(player1.knights.getCards(), maxScore);
+        MoveToDropping(player2.knights.getCards(), maxScore);
+        MoveToDropping(player2.archers.getCards(), maxScore);
+        MoveToDropping(player2.helpers.getCards(), maxScore);
 
         player1.updateScore();
         player2.updateScore();
@@ -122,24 +122,61 @@ public class GameManager
  
         changeTurn();
 
-        instance.StartCoroutine(onPlaceDestroy(destroyCardController));
+        instance.StartCoroutine(onPlaceDestroyRoutine(destroyCardController));
     }
 
-    public static void MoveToDropping(LineCards line, int value)
+    public void onPlaceDoctor(CardController cardController, Player player)
     {
-        for (int i = 0; i < line.cards.Count; i++)
-        {
-            CardController cardController = line.cards[i];
+        Transform dropping = player.ui.dropping.transform;
 
+        if (dropping.childCount > 0)
+        {
+            Transform card = dropping.GetChild(dropping.childCount - 1);
+            card.SetParent(player.ui.hand);
+
+            player.ui.updateDroppingCount();
+        }
+
+        onPlaceStandart(cardController, player);
+    }
+
+    public void onPlaceSquad(CardController cardController, Player player)
+    {
+        MainScript.game.onPlaceStandart(cardController, player);
+
+        int sibIndex = 0;
+
+        for (int i = 0; i < cardController.transform.parent.childCount; i++)
+        {
+            CardController fieldCardController = cardController.transform.parent.GetChild(i).GetComponent<CardController>();
+
+            if (fieldCardController && fieldCardController.card.id == cardController.card.id)
+            {
+                sibIndex = fieldCardController.transform.GetSiblingIndex();
+                break;
+            }
+        }
+
+        cardController.transform.SetSiblingIndex(sibIndex);
+    }
+
+    public static void MoveToDropping(List<CardController> line, int value)
+    {
+        foreach (CardController cardController in line)
+        {
             if (cardController.card.score == value)
             {
                 cardController.Movement.MoveToParent(cardController.player.ui.dropping.transform);
-                line.cards.RemoveAt(i);
+                if(cardController.card.subtype == CardSubType.SQUAD)
+                {
+                    cardController.card.score = cardController.card.basescore;
+                    cardController.Info.UpdateBaffCard();
+                }
             }
         }
     }
 
-    IEnumerator onPlaceDestroy(CardController cardController)
+    IEnumerator onPlaceDestroyRoutine(CardController cardController)
     {
         yield return new WaitForSeconds(2);
 

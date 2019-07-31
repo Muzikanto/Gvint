@@ -84,6 +84,7 @@
     <Compile Include="Assets\Scripts\Interface\btnStartGameScript.cs" />
     <Compile Include="Assets\Scripts\Interface\btnToMenuScript.cs" />
     <Compile Include="Assets\Scripts\Interface\ESC\ESCCloseScript.cs" />
+    <Compile Include="Assets\Scripts\Interface\ESC\ESCOpenScript.cs" />
     <Compile Include="Assets\Scripts\MainScript.cs" />
     <Compile Include="Assets\Scripts\Player\Player.cs" />
     <Compile Include="Assets\Scripts\Player\PlayerUIIController.cs" />

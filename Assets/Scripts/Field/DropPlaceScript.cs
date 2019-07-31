@@ -35,20 +35,7 @@ public class DropPlaceScript : MonoBehaviour, IDropHandler {
 
         if (TypeCard == card.type && cardController.Movement.isDraggable)
         {
-            switch (card.subtype)
-            {
-                case CardSubType.SPOOK:
-                    MainScript.game.onPlaceSpook(cardController, Type);
-                    break;
-                case CardSubType.DESTROY:
-                    MainScript.game.onPlaceDestoy(cardController);
-                    break;
-                default:
-                    MainScript.game.onPlaceCard(cardController);
-                    break;
-            }
-
-            cardController.Movement.DefaultParent = transform;            
+            cardController.Movement.DefaultParent = transform;       
         }
     }
 }

@@ -5,6 +5,9 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
 public class CardMovementScript : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler {
+    [SerializeField]
+    CardController cardController;
+
     [HideInInspector]
     public Transform DefaultParent, DefaultTempCardParent;   
     [HideInInspector]
@@ -77,6 +80,13 @@ public class CardMovementScript : MonoBehaviour, IBeginDragHandler, IDragHandler
         TempCardGO.transform.SetParent(GameObject.Find("Game").transform.Find("Other").transform);
         TempCardGO.transform.localPosition = new Vector3(2340, 0);
         // --------
+
+        DropPlaceScript field = transform.parent.GetComponent<DropPlaceScript>();
+        if (field != null)
+        {
+            transform.SetAsLastSibling();
+            MainScript.game.onPlaceCard(cardController, field.Type);
+        }
     }
 
     public void MoveToParent(Transform newParent)

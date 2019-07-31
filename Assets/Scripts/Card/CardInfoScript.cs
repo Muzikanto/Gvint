@@ -14,7 +14,7 @@ public class CardInfoScript : MonoBehaviour, IPointerEnterHandler, IPointerExitH
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        MainScript.ShowPreviewCard(cardController.card, cardController.player);
+        MainScript.ShowPreviewCard(cardController);
     }
 
     public void OnPointerExit(PointerEventData eventData)
@@ -77,9 +77,33 @@ public class CardInfoScript : MonoBehaviour, IPointerEnterHandler, IPointerExitH
 
         if (cardController.card.god)
         {
-            transform.Find("score").GetComponent<Image>().sprite = Resources.Load<Sprite>("Sprite/icon/score_god");
-            score.color = new Color(255, 255, 255);
+            transform.Find("score").GetComponent<Image>().sprite = Resources.Load<Sprite>("Sprite/icon/score_god_bg");
+            score.color = Color.red;
         }    
+    }
+
+    public void UpdateBaffCard(int mult)
+    {
+        if (mult == 1)
+        {
+            score.color = Color.yellow;
+        } else {
+            score.color = Color.white;
+        }
+
+        cardController.card.score = cardController.card.basescore * mult;
+        score.text = cardController.card.score.ToString();
+    }
+
+    public void UpdateBaffCard()
+    {
+        if (cardController.card.score == cardController.card.basescore)
+        {
+            score.color = Color.yellow;
+        }  else  {
+            score.color = Color.white;
+        }
+        score.text = cardController.card.basescore.ToString();
     }
 
     public void ActivateAll()
