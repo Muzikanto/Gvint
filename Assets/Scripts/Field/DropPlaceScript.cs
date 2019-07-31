@@ -9,7 +9,9 @@ public enum FieldType
 }
 
 public class DropPlaceScript : MonoBehaviour, IDropHandler {
+    [SerializeField]
     public FieldType Type;
+    [SerializeField]
     public CardType TypeCard;
 
     public void OnDrop(PointerEventData eventData)

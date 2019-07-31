@@ -4,8 +4,11 @@ using UnityEngine;
 using UnityEngine.UI;
 
 public class LineCards: MonoBehaviour {
-    public List<CardController> cards = new List<CardController>();
+   // [HideInInspector]
+   // public List<CardController> cards = new List<CardController>();
+    [HideInInspector]
     public bool baff = false;
+    [HideInInspector]
     public int score = 0;
 
     public Text scoreText;

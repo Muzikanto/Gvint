@@ -5,11 +5,17 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
 public class CardMovementScript : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler {
-    Camera MainCamera;
-    Vector3 offset;
-    public Transform DefaultParent, DefaultTempCardParent;
-    GameObject TempCardGO;
+    [HideInInspector]
+    public Transform DefaultParent, DefaultTempCardParent;   
+    [HideInInspector]
     public bool isDraggable;
+    [HideInInspector]
+    public bool isDragged = false;
+
+    private Vector3 offset;
+
+    private Camera MainCamera;
+    private GameObject TempCardGO;
 
     void Awake()
     {
@@ -31,6 +37,8 @@ public class CardMovementScript : MonoBehaviour, IBeginDragHandler, IDragHandler
         {
             return;
         }
+
+        isDragged = true;
 
         // TempCard
         TempCardGO.transform.SetParent(DefaultParent);
@@ -59,12 +67,14 @@ public class CardMovementScript : MonoBehaviour, IBeginDragHandler, IDragHandler
             return;
         }
 
+        isDragged = false;
+
         transform.SetParent(DefaultParent);
         GetComponent<CanvasGroup>().blocksRaycasts = true;
         transform.SetSiblingIndex(TempCardGO.transform.GetSiblingIndex());
 
         // TempCard
-        TempCardGO.transform.SetParent(GameObject.Find("Game").transform);
+        TempCardGO.transform.SetParent(GameObject.Find("Game").transform.Find("Other").transform);
         TempCardGO.transform.localPosition = new Vector3(2340, 0);
         // --------
     }

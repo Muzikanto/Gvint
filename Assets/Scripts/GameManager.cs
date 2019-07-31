@@ -5,13 +5,13 @@ using UnityEngine.SceneManagement;
 
 public class GameManager
 {
-    public MonoBehaviour instance;
+    public MainScript instance;
 
     public bool isPlayerTurn = true;
     public Player player1;
     public Player player2;
 
-    public GameManager(MonoBehaviour _instance, Player _player1, Player _player2)
+    public GameManager(MainScript _instance, Player _player1, Player _player2)
     {
         instance = _instance;
         player1 = _player1;
@@ -41,11 +41,13 @@ public class GameManager
     {
         if(player2.handCardsCount == 0 && player1.handCardsCount == 0)
         {
-            MainScript.onEndGame();
+            instance.ShowVictory();
         } else
         {
             isPlayerTurn = !isPlayerTurn;
         }
+
+        instance.onChangeTurn();
     }
 
     public void onPlaceSpook(CardController cardController, FieldType Type)
@@ -87,7 +89,6 @@ public class GameManager
     public void onPlaceDestoy(CardController destroyCardController)
     {
         int maxScore = 0;
-        List<CardController> cardsToDestroy = new List<CardController>();
         List<CardController> allCards = new List<CardController>();
 
         allCards.AddRange(player1.helpers.cards);
@@ -99,23 +100,20 @@ public class GameManager
 
         foreach (CardController cardController in allCards)
         {
-            if (cardController.card.score > maxScore)
-            {
-                maxScore = cardController.card.score;
-                cardsToDestroy = new List<CardController>();
-                MonoBehaviour.print(cardController.card.score);
-            }
-
-            if (cardController.card.god == false)
-            {
-                cardsToDestroy.Add(cardController);
+            if (cardController.card.god == false) {
+                if (cardController.card.score > maxScore)
+                {
+                    maxScore = cardController.card.score;
+                }
             }
         }
 
-        foreach (CardController cardController in cardsToDestroy)
-        {
-            cardController.Movement.MoveToParent(cardController.player.ui.dropping.transform);
-        }
+        MoveToDropping(player1.helpers, maxScore);
+        MoveToDropping(player1.archers, maxScore);
+        MoveToDropping(player1.knights, maxScore);
+        MoveToDropping(player2.knights, maxScore);
+        MoveToDropping(player2.archers, maxScore);
+        MoveToDropping(player2.helpers, maxScore);
 
         player1.updateScore();
         player2.updateScore();
@@ -125,6 +123,20 @@ public class GameManager
         changeTurn();
 
         instance.StartCoroutine(onPlaceDestroy(destroyCardController));
+    }
+
+    public static void MoveToDropping(LineCards line, int value)
+    {
+        for (int i = 0; i < line.cards.Count; i++)
+        {
+            CardController cardController = line.cards[i];
+
+            if (cardController.card.score == value)
+            {
+                cardController.Movement.MoveToParent(cardController.player.ui.dropping.transform);
+                line.cards.RemoveAt(i);
+            }
+        }
     }
 
     IEnumerator onPlaceDestroy(CardController cardController)

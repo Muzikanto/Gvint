@@ -2,11 +2,28 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
-public class CardInfoScript : MonoBehaviour {
-    public Text score;
-    public Image type, subtype;
-    public CardController cardController;
+public class CardInfoScript : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler {
+    [SerializeField]
+    Text score;
+    [SerializeField]
+    Image type, subtype;
+    [SerializeField]
+    CardController cardController;
+
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        MainScript.ShowPreviewCard(cardController.card, cardController.player);
+    }
+
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        if (!cardController.Movement.isDragged)
+        {
+            MainScript.HidePreviewCard();
+        }
+    }
 
     public void ShowCardInfo()
     {
@@ -16,14 +33,17 @@ public class CardInfoScript : MonoBehaviour {
 
         if (card.type == CardType.SPEC)
         {
-            Destroy(transform.Find("score").gameObject);
-            Destroy(type.gameObject);
-            Destroy(subtype.gameObject);
+            transform.Find("score").gameObject.SetActive(false);
+            type.gameObject.SetActive(false);
+            subtype.gameObject.SetActive(false);
 
             return;
         }
 
-        score.text = card.score.ToString();
+        if (score != null)
+        {
+            score.text = card.score.ToString();
+        }
 
         switch (card.type)
         {
@@ -60,6 +80,13 @@ public class CardInfoScript : MonoBehaviour {
             transform.Find("score").GetComponent<Image>().sprite = Resources.Load<Sprite>("Sprite/icon/score_god");
             score.color = new Color(255, 255, 255);
         }    
+    }
+
+    public void ActivateAll()
+    {
+        transform.Find("score").gameObject.SetActive(true);
+        type.gameObject.SetActive(true);
+        subtype.gameObject.SetActive(true);
     }
 }
 

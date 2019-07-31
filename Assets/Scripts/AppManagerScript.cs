@@ -23,11 +23,6 @@ public static class AppManager
         MainScript.game = null;
         SceneManager.LoadScene("start");
     }
-
-    public static void restartGame(MonoBehaviour instance)
-    {
-        MainScript.StartGame(instance);
-    }
 }
 
 public class AppManagerScript : MonoBehaviour

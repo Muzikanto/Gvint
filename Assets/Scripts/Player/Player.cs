@@ -4,13 +4,17 @@ using UnityEngine.UI;
 
 public class Player : MonoBehaviour
 {
-    public int score = 0, handCardsCount = 0;
+
     public bool isPlayerOne;
-    public List<Card> deck = new List<Card>();
     public LineCards helpers;
     public LineCards archers;
     public LineCards knights;
     public PlayerUIIController ui;
+
+    [HideInInspector]
+    public int score = 0, handCardsCount = 0;
+    [HideInInspector]
+    public List<Card> deck = new List<Card>();
 
     public void setDeck(List<Card> _deck)
     {
@@ -60,6 +64,9 @@ public class Player : MonoBehaviour
 
     public void updateScore()
     {
+        helpers.calcScore();
+        archers.calcScore();
+        knights.calcScore();
         score = helpers.score + archers.score + knights.score;
         ui.updateScore();
     }

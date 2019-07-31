@@ -3,11 +3,17 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class CardController : MonoBehaviour {
+    [SerializeField]
     public CardInfoScript Info;
+    [SerializeField]
     public CardMovementScript Movement;
-    public Card card;
-    public bool isPlayerOneCard;
+
+    [HideInInspector]
     public Player player;
+    [HideInInspector]
+    public Card card;
+    [HideInInspector]
+    public bool isPlayerOneCard;
 
     public void Init(Card _card, Player _player)
     {

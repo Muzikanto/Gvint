@@ -5,32 +5,38 @@ using UnityEngine.UI;
 
 public class MainScript : MonoBehaviour
 {
+    [SerializeField]
+    public Text turnField;
+    [SerializeField]
     public GameObject cardPref;
-    public static GameObject VictoryContainer;
     [SerializeField]
     private GameObject victoryContainer;
     [SerializeField]
     private GameObject ESCcontainer;
+    [SerializeField]
+    private CardController _previewCard;
 
+    public static CardController previewCard;
     public static GameManager game = null;
 
     private void Awake()
     {
         CardManager.cardPref = cardPref;
+        previewCard = _previewCard;
         CardManager.Init();
-        VictoryContainer = victoryContainer;
     }
 
     private void Start()
     {
-        StartGame(this);
+        HidePreviewCard();
+        StartGame();
     }
 
     private void Update()
     {
         if (Input.GetKeyDown("escape"))
         {
-            if (victoryContainer.active)
+            if (victoryContainer.activeSelf)
             {
                 victoryContainer.SetActive(false);
             }
@@ -38,9 +44,10 @@ public class MainScript : MonoBehaviour
         }
     }
 
-    public static void StartGame(MonoBehaviour instance)
+    public void StartGame()
     {
-        game = new GameManager(instance, GameObject.Find("Player1").GetComponent<Player>(), GameObject.Find("Player2").GetComponent<Player>());
+        game = new GameManager(this, GameObject.Find("Player1").GetComponent<Player>(), GameObject.Find("Player2").GetComponent<Player>());
+        game.player2.ui.hand.gameObject.SetActive(true);
 
         List<Card> deck1 = new List<Card>();
         List<Card> deck2 = new List<Card>();
@@ -60,13 +67,14 @@ public class MainScript : MonoBehaviour
             game.player1.takeCard();
             game.player2.takeCard();
         }
+        game.player2.ui.hand.gameObject.SetActive(false);
     }
 
-    public static void onEndGame()
+    public void ShowVictory()
     {
-        VictoryContainer.SetActive(true);
+        victoryContainer.SetActive(true);
 
-        Text textField = VictoryContainer.transform.Find("Text").GetComponent<Text>();
+        Text textField = victoryContainer.transform.Find("Text").GetComponent<Text>();
 
         if (game.player1.score != game.player2.score)
         {
@@ -76,5 +84,27 @@ public class MainScript : MonoBehaviour
         {
             textField.text = "Ничья.";
         }
+    }
+
+    public void onChangeTurn()
+    {
+        turnField.text = MainScript.game.isPlayerTurn ? "Your Turn!" : "Enemy Turn.";
+        game.player1.ui.hand.gameObject.SetActive(game.isPlayerTurn);
+        game.player2.ui.hand.gameObject.SetActive(!game.isPlayerTurn);
+
+        HidePreviewCard();
+    }
+
+    public static void ShowPreviewCard(Card card, Player player)
+    {
+        previewCard.Init(card, player);
+        previewCard.Info.ActivateAll();
+        previewCard.Info.ShowCardInfo();
+        previewCard.gameObject.SetActive(true);
+    }
+
+    public static void HidePreviewCard()
+    {
+        previewCard.gameObject.SetActive(false);
     }
 }
